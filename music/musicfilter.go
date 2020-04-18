@@ -45,10 +45,10 @@ func Unzip(fileFullPath, destinationLocation string) error {
 		destinationFilePath := filepath.Join(destinationLocation, file.Name)
 
 		if file.FileInfo().IsDir() {
-			os.MkdirAll(destinationFilePath, file.Mode())
+			os.MkdirAll(destinationFilePath, 0777)
 		} else {
-			os.MkdirAll(filepath.Dir(destinationFilePath), file.Mode())
-			destinationFileHandle, err := os.OpenFile(destinationFilePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, file.Mode())
+			os.MkdirAll(filepath.Dir(destinationFilePath), 0777)
+			destinationFileHandle, err := os.OpenFile(destinationFilePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0777)
 			if err != nil {
 				return err
 			}

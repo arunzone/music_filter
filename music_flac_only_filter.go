@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"music_filter/music"
+	"strings"
 )
 
 func main() {
@@ -13,12 +14,18 @@ func main() {
 		for _, file := range files {
 			fullPathFileName := music.AbsolutePath(location, file.Name())
 			fmt.Println(fullPathFileName)
-			err := music.Unzip(fullPathFileName, music.FileNameWithoutExtension(fullPathFileName))
-			if err != nil {
-				panic(err)
+			if !IsHiddenFile(file.Name()) {
+				err := music.Unzip(fullPathFileName, music.FileNameWithoutExtension(fullPathFileName))
+				if err != nil {
+					panic(err)
+				}
 			}
 		}
 	}
 
+}
+
+func IsHiddenFile(fileName string) bool {
+	return strings.HasPrefix(fileName, ".")
 }
 
