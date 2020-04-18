@@ -3,6 +3,7 @@ package music
 import (
 	"archive/zip"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -34,7 +35,7 @@ func FileNameWithoutExtension(fileName string) string {
 	return strings.TrimSuffix(fileName, extension)
 }
 
-func Unzip(fileFullPath, detinationLocation string) error {
+func Unzip(fileFullPath, destinationLocation string) error {
 	zipReader, err := zip.OpenReader(fileFullPath)
 	if err != nil {
 		return err
@@ -45,9 +46,43 @@ func Unzip(fileFullPath, detinationLocation string) error {
 		}
 	}()
 
+	os.MkdirAll(destinationLocation, 0755)
+
+	extractAndWriteFile := func(file *zip.File) error {
+		fileHandle, err := file.Open()
+		if err != nil {
+			return err
+		}
+		defer func() {
+			if err := fileHandle.Close(); err != nil {
+				panic(err)
+			}
+		}()
+
+		destinationFilePath := filepath.Join(destinationLocation, file.Name)
+
+		os.MkdirAll(filepath.Dir(destinationFilePath), file.Mode())
+		destinationFileHandle, err := os.OpenFile(destinationFilePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, file.Mode())
+		if err != nil {
+			return err
+		}
+		defer func() {
+			if err := destinationFileHandle.Close(); err != nil {
+				panic(err)
+			}
+		}()
+
+		_, err = io.Copy(destinationFileHandle, fileHandle)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
 	for _, file := range zipReader.File {
 		fmt.Println(file.Name)
+		extractAndWriteFile(file)
 	}
-	os.MkdirAll(detinationLocation, 0755)
+
 	return nil
 }
