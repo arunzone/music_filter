@@ -4,27 +4,10 @@ import (
 	"archive/zip"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 )
-
-func main() {
-	location := "/Users/arun/Downloads/Music"
-	files, err := ioutil.ReadDir(location)
-	if err == nil {
-		for _, file := range files {
-			fullPathFileName := AbsolutePath(location, file.Name())
-			fmt.Println(fullPathFileName)
-			err := Unzip(fullPathFileName, FileNameWithoutExtension(fullPathFileName))
-			if err != nil {
-				panic(err)
-			}
-		}
-	}
-
-}
 
 func AbsolutePath(parent, fileName string) string {
 	return filepath.Join(parent, fileName)
@@ -46,7 +29,7 @@ func Unzip(fileFullPath, destinationLocation string) error {
 		}
 	}()
 
-	os.MkdirAll(destinationLocation, 0755)
+	os.MkdirAll(destinationLocation, 0777)
 
 	extractAndWriteFile := func(file *zip.File) error {
 		fileHandle, err := file.Open()
@@ -61,20 +44,24 @@ func Unzip(fileFullPath, destinationLocation string) error {
 
 		destinationFilePath := filepath.Join(destinationLocation, file.Name)
 
-		os.MkdirAll(filepath.Dir(destinationFilePath), file.Mode())
-		destinationFileHandle, err := os.OpenFile(destinationFilePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, file.Mode())
-		if err != nil {
-			return err
-		}
-		defer func() {
-			if err := destinationFileHandle.Close(); err != nil {
-				panic(err)
+		if file.FileInfo().IsDir() {
+			os.MkdirAll(destinationFilePath, file.Mode())
+		} else {
+			os.MkdirAll(filepath.Dir(destinationFilePath), file.Mode())
+			destinationFileHandle, err := os.OpenFile(destinationFilePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, file.Mode())
+			if err != nil {
+				return err
 			}
-		}()
+			defer func() {
+				if err := destinationFileHandle.Close(); err != nil {
+					panic(err)
+				}
+			}()
 
-		_, err = io.Copy(destinationFileHandle, fileHandle)
-		if err != nil {
-			return err
+			_, err = io.Copy(destinationFileHandle, fileHandle)
+			if err != nil {
+				return err
+			}
 		}
 		return nil
 	}

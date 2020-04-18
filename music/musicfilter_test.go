@@ -32,6 +32,12 @@ func TestUnzipNotReturnError(t *testing.T) {
 		t.Errorf("expected '%v' but got '%v'", nil, zipStatus)
 	}
 
+	t.Cleanup(func() {
+		if err == nil {
+			os.RemoveAll(destinationPath)
+		}
+	})
+
 }
 
 func TestUnzipCreateDestinationDirectory(t *testing.T) {
@@ -52,6 +58,13 @@ func TestUnzipCreateDestinationDirectory(t *testing.T) {
 	if !stat.IsDir() {
 		t.Errorf("expected '%v' but got '%v'", true, stat.IsDir())
 	}
+
+	t.Cleanup(func() {
+		if err == nil {
+			os.RemoveAll(destinationPath)
+		}
+	})
+
 }
 
 func TestUnzipExtractFilesDestinationDirectory(t *testing.T) {
@@ -60,7 +73,7 @@ func TestUnzipExtractFilesDestinationDirectory(t *testing.T) {
 		t.Fatalf(" Problem in finding current working directory")
 	}
 	absPath, _ := filepath.Abs(pwd + "/../test/test-simple.zip")
-	destinationPath, _ := filepath.Abs(pwd + "/../test/test.txt")
+	destinationPath, _ := filepath.Abs(pwd + "/../test/test-simple")
 	expectedFile, _ := filepath.Abs(pwd + "/../test/test-simple/test.txt")
 
 	Unzip(absPath, destinationPath)
@@ -78,6 +91,43 @@ func TestUnzipExtractFilesDestinationDirectory(t *testing.T) {
 		t.Errorf("expected '%v' but got '%v'", 1, stat.Size())
 	}
 
+	t.Cleanup(func() {
+		if err == nil {
+			os.RemoveAll(destinationPath)
+		}
+	})
+
+}
+
+func TestUnzipExtractNestedFilesDestinationDirectory(t *testing.T) {
+	pwd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf(" Problem in finding current working directory")
+	}
+	absPath, _ := filepath.Abs(pwd + "/../test/test-nested.zip")
+	destinationPath, _ := filepath.Abs(pwd + "/../test/test-nested")
+	expectedFile, _ := filepath.Abs(pwd + "/../test/test-nested/dir/test.txt")
+
+	Unzip(absPath, destinationPath)
+
+	stat, err := os.Stat(expectedFile)
+	if err != nil {
+		t.Errorf("expected '%v' but got '%v'", true, err)
+	}
+
+	if stat.IsDir() {
+		t.Errorf("expected '%v' but got '%v'", true, stat.IsDir())
+	}
+
+	if stat.Size() != 1 {
+		t.Errorf("expected '%v' but got '%v'", 1, stat.Size())
+	}
+
+	t.Cleanup(func() {
+		if err == nil {
+			os.RemoveAll(destinationPath)
+		}
+	})
 }
 
 func TestFileNameWithoutExtension(t *testing.T) {
