@@ -3,6 +3,7 @@ package unzip
 import (
 	"os"
 	"path/filepath"
+	"reflect"
 	"testing"
 )
 
@@ -134,4 +135,24 @@ func TestFileNameWithoutExtension(t *testing.T) {
 	name := FileNameWithoutExtension("abc.txt")
 
 	assertEquals(name, "abc", t)
+}
+
+func TestListFileNamesInZip(t *testing.T) {
+	pwd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf(" Problem in finding current working directory")
+	}
+	parentDir, _ := filepath.Abs(pwd + "/../test")
+	absPath, _ := filepath.Abs(pwd + "/../test/test-nested.zip")
+
+	fileNamesInZip := ListFileNamesInZip(absPath)
+
+	expectedFileNames := []string{
+		parentDir + "/dir",
+		parentDir + "/dir/test.txt",
+	}
+
+	if !reflect.DeepEqual(fileNamesInZip, expectedFileNames) {
+		t.Errorf("expected '%v' but got '%v'", expectedFileNames, fileNamesInZip)
+	}
 }

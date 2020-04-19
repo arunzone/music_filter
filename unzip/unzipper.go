@@ -18,6 +18,24 @@ func FileNameWithoutExtension(fileName string) string {
 	return strings.TrimSuffix(fileName, extension)
 }
 
+func ListFileNamesInZip(fileFullPath string) []string {
+	zipReader, err := zip.OpenReader(fileFullPath)
+	if err != nil {
+		panic(err)
+	}
+	defer func() {
+		if err := zipReader.Close(); err != nil {
+			panic(err)
+		}
+	}()
+	fileNames := make([]string, len(zipReader.File), len(zipReader.File))
+	for index, file := range zipReader.File {
+		destinationFilePath := filepath.Join(filepath.Dir(fileFullPath), file.Name)
+		fileNames[index] = destinationFilePath
+	}
+	return fileNames
+}
+
 func Unzip(fileFullPath, destinationLocation string) error {
 	zipReader, err := zip.OpenReader(fileFullPath)
 	if err != nil {

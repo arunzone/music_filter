@@ -41,4 +41,3 @@ func ExtractZipOn(location string) {
 func IsHiddenFile(fileName string) bool {
 	return strings.HasPrefix(fileName, ".")
 }
-
