@@ -10,7 +10,7 @@ func TestFilterFlac(t *testing.T) {
 		"/a/b/one.txt",
 		"/a/b/two.flac"}
 
-	flacFilePaths := FilterFlac(fileFullPaths)
+	flacFilePaths := FilterBy(fileFullPaths,".flac")
 
 	expectedPaths := []string{"/a/b/two.flac"}
 

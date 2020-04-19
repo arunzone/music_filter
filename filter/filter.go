@@ -5,12 +5,11 @@ import (
 	"strings"
 )
 
-func FilterFlac(fileFullPaths []string) []string{
+func FilterBy(fileFullPaths []string, extension string) []string{
 	var filteredFullPaths []string
 	for _, fileFullPath := range fileFullPaths {
 		_, fileName := filepath.Split(fileFullPath)
-		extension := filepath.Ext(fileName)
-		if strings.EqualFold(extension, ".flac") {
+		if strings.EqualFold(filepath.Ext(fileName), extension) {
 			filteredFullPaths = append(filteredFullPaths, fileFullPath)
 		}
 	}
