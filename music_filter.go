@@ -2,6 +2,7 @@ package main
 
 import (
 	"io/ioutil"
+	"music_filter/filter"
 	"music_filter/unzip"
 	"path/filepath"
 	"strings"
@@ -9,8 +10,10 @@ import (
 
 func main() {
 	location := "/Users/arun/Downloads/Music"
+	destinationLocation := "/Users/arun/Documents/Music"
+	fileNames := ListFileNamesOn(location)
+	flacFileNames := filter.FilterFlac(fileNames)
 	ExtractZipOn(location)
-	ListFileNamesOn(location)
 
 }
 
