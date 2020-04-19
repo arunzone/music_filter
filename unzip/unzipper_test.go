@@ -137,19 +137,39 @@ func TestFileNameWithoutExtension(t *testing.T) {
 	assertEquals(name, "abc", t)
 }
 
-func TestListFileNamesInZip(t *testing.T) {
+func TestListFileNamesInZipWithDestination(t *testing.T) {
 	pwd, err := os.Getwd()
 	if err != nil {
 		t.Fatalf(" Problem in finding current working directory")
 	}
-	parentDir, _ := filepath.Abs(pwd + "/../test")
+	destinationLocation, _ := filepath.Abs(pwd + "/../test/test-nested")
 	absPath, _ := filepath.Abs(pwd + "/../test/test-nested.zip")
 
-	fileNamesInZip := ListFileNamesInZip(absPath)
+	fileNamesInZip := ListFileNamesInZip(absPath, destinationLocation)
 
 	expectedFileNames := []string{
-		parentDir + "/dir",
-		parentDir + "/dir/test.txt",
+		destinationLocation + "/dir",
+		destinationLocation + "/dir/test.txt",
+	}
+
+	if !reflect.DeepEqual(fileNamesInZip, expectedFileNames) {
+		t.Errorf("expected '%v' but got '%v'", expectedFileNames, fileNamesInZip)
+	}
+}
+
+func TestListFileNamesInZipWithoutDestination(t *testing.T) {
+	pwd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf(" Problem in finding current working directory")
+	}
+	destinationLocation, _ := filepath.Abs(pwd + "/../test")
+	absPath, _ := filepath.Abs(pwd + "/../test/test-nested.zip")
+
+	fileNamesInZip := ListFileNamesInZip(absPath, "")
+
+	expectedFileNames := []string{
+		destinationLocation + "/dir",
+		destinationLocation + "/dir/test.txt",
 	}
 
 	if !reflect.DeepEqual(fileNamesInZip, expectedFileNames) {
