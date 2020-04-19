@@ -1,4 +1,4 @@
-package music
+package unzip
 
 import (
 	"os"
