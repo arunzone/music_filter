@@ -20,7 +20,7 @@ func TestListFilesOn(t *testing.T) {
 	if err != nil {
 		t.Fatalf(" Problem in finding current working directory")
 	}
-	absPath, _ := filepath.Abs(filepath.Join(pwd,"test", "dir"))
+	absPath, _ := filepath.Abs(filepath.Join(pwd,"test", "directory"))
 
 	fileNames := ListFileNamesOn(absPath)
 

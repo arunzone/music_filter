@@ -131,6 +131,37 @@ func TestUnzipExtractNestedFilesDestinationDirectory(t *testing.T) {
 	})
 }
 
+func TestUnzipExtractNestedFilesWithoutDestinationDirectory(t *testing.T) {
+	pwd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf(" Problem in finding current working directory")
+	}
+	absPath, _ := filepath.Abs(pwd + "/../test/test-nested.zip")
+	destinationPath, _ := filepath.Abs(pwd + "/../test")
+	expectedFile, _ := filepath.Abs(pwd + "/../test/dir/test.txt")
+
+	Unzip(absPath, "")
+
+	stat, err := os.Stat(expectedFile)
+	if err != nil {
+		t.Errorf("expected '%v' but got '%v'", true, err)
+	}
+
+	if stat.IsDir() {
+		t.Errorf("expected '%v' but got '%v'", true, stat.IsDir())
+	}
+
+	if stat.Size() != 1 {
+		t.Errorf("expected '%v' but got '%v'", 1, stat.Size())
+	}
+
+	t.Cleanup(func() {
+		if err == nil {
+			os.RemoveAll(destinationPath+"/dir")
+		}
+	})
+}
+
 func TestFileNameWithoutExtension(t *testing.T) {
 	name := FileNameWithoutExtension("abc.txt")
 

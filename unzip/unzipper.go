@@ -56,8 +56,8 @@ func Unzip(fileFullPath, destinationLocation string) error {
 			panic(err)
 		}
 	}()
-
-	os.MkdirAll(destinationLocation, 0777)
+	actualTargetLocation := actualTargetLocation(fileFullPath, destinationLocation)
+	os.MkdirAll(actualTargetLocation, 0777)
 
 	extractAndWriteFile := func(file *zip.File) error {
 		fileHandle, err := file.Open()
@@ -70,7 +70,7 @@ func Unzip(fileFullPath, destinationLocation string) error {
 			}
 		}()
 
-		destinationFilePath := filepath.Join(destinationLocation, file.Name)
+		destinationFilePath := filepath.Join(actualTargetLocation, file.Name)
 
 		if file.FileInfo().IsDir() {
 			os.MkdirAll(destinationFilePath, 0777)
